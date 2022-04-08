@@ -35,6 +35,11 @@ Mappings:
     Prod: 
       lower: "prod"
 
+Conditions:
+  DevResources: !Equals
+    - !Ref environmentName
+    - Dev
+
 Resources:
   PipelineArtifacts:
     Type: AWS::S3::Bucket
@@ -53,7 +58,25 @@ Resources:
         RestrictPublicBuckets: true
         BlockPublicPolicy: true
         BlockPublicAcls: true
-      
+
+  FrontendCoverageReportGroup:
+    Type: AWS::CodeBuild::ReportGroup
+    Condition: DevResources
+    Properties:
+      ExportConfig:
+        ExportConfigType: NO_EXPORT
+      Name: !Sub ${applicationName}-web-coverage-report-group
+      Type: CODE_COVERAGE
+    
+  FrontendTestReportGroup:
+    Type: AWS::CodeBuild::ReportGroup
+    Condition: DevResources
+    Properties:
+      ExportConfig:
+        ExportConfigType: NO_EXPORT
+      Name: !Sub ${applicationName}-web-test-report-group
+      Type: TEST
+       
   CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
