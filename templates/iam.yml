@@ -244,65 +244,73 @@ Resources:
       - PolicyName: !Sub ${applicationName}-glue-baseline-permissions
         PolicyDocument:
           Statement:
-          - Sid: GeneralPermissions
-            Effect: Allow
-            Action:
-              - "glue:*"
-              - "s3:GetBucketLocation"
-              - "s3:ListBucket"
-              - "s3:ListAllMyBuckets"
-              - "s3:GetBucketAcl",
-              - "ec2:DescribeVpcEndpoints"
-              - "ec2:DescribeRouteTables"
-              - "ec2:CreateNetworkInterface"
-              - "ec2:DeleteNetworkInterface"				
-              - "ec2:DescribeNetworkInterfaces"
-              - "ec2:DescribeSecurityGroups"
-              - "ec2:DescribeSubnets"
-              - "ec2:DescribeVpcAttribute"
-              - "iam:ListRolePolicies"
-              - "iam:GetRole"
-              - "iam:GetRolePolicy"
-              - "cloudwatch:PutMetricData"
-            Resource: "*"
-          - Sid: S3GetPutDeletePermissions
-            Effect: Allow
-            Action:
-              - "s3:GetObject"
-              - "s3:PutObject"
-              - "s3:DeleteObject"
-            Resource: 
-              - "arn:aws:s3:::aws-glue-*/*"
-              - "arn:aws:s3:::*/*aws-glue-*/*"
-              - !Sub "arn:aws:s3::${applicationName}-*/*"
-          - Sid: S3GetPermissions
-            Effect: Allow
-            Action:
-              - "s3:GetObject"
-            Resource:
-              - "arn:aws:s3:::crawler-public*"
-              - "arn:aws:s3:::aws-glue-*"
-          - Sid: LogPermissions
-            Effect: Allow
-            Action:
-              - "logs:CreateLogGroup"
-              - "logs:CreateLogStream"
-              - "logs:PutLogEvents"
-              - "logs:AssociateKmsKey"
-            Resource: 
-              - "arn:aws:logs:*:*/aws-glue/*"
-          - Sid: ec2TagPermissions
-            Effect: Allow
-            Action:
-              - "ec2:CreateTags"
-              - "ec2:DeleteTags"
-            Resource:
-              - "arn:aws:ec2:*:*:network-interface/*"
-              - "arn:aws:ec2:*:*:security-group/*"
-              - "arn:aws:ec2:*:*:instance/*"
-            Condition:
-              ForAllValues:StringEquals:
-                "aws:TagKeys": "aws-glue-service-resource"
+            - Sid: GeneralPermissions
+              Effect: Allow
+              Action:
+                - "glue:*"
+                - "s3:GetBucketLocation"
+                - "s3:ListBucket"
+                - "s3:ListAllMyBuckets"
+                - "s3:GetBucketAcl"
+                - "ec2:DescribeVpcEndpoints"
+                - "ec2:DescribeRouteTables"
+                - "ec2:CreateNetworkInterface"
+                - "ec2:DeleteNetworkInterface"
+                - "ec2:DescribeNetworkInterfaces"
+                - "ec2:DescribeSecurityGroups"
+                - "ec2:DescribeSubnets"
+                - "ec2:DescribeVpcAttribute"
+                - "iam:ListRolePolicies"
+                - "iam:GetRole"
+                - "iam:GetRolePolicy"
+                - "cloudwatch:PutMetricData"
+              Resource: "*"
+            - Sid: S3CreatePutPermissions
+              Effect: Allow
+              Action: 
+                - "s3:CreateBucket"
+                - "s3:PutBucketPublicAccessBlock"
+              Resource:
+                - "arn:aws:s3:::aws-glue-*"
+            - Sid: S3GetPutDeletePermissions
+              Effect: Allow
+              Action:
+                - "s3:GetObject"
+                - "s3:PutObject"
+                - "s3:DeleteObject"
+              Resource: 
+                - "arn:aws:s3:::aws-glue-*/*"
+                - "arn:aws:s3:::*/*aws-glue-*/*"
+                - !Sub "arn:aws:s3:::${applicationName}-*/*"
+            - Sid: S3GetPermissions
+              Effect: Allow
+              Action:
+                - "s3:GetObject"
+              Resource:
+                - "arn:aws:s3:::crawler-public*"
+                - "arn:aws:s3:::aws-glue-*"
+            - Sid: LogPermissions
+              Effect: Allow
+              Action:
+                - "logs:CreateLogGroup"
+                - "logs:CreateLogStream"
+                - "logs:PutLogEvents"
+                - "logs:AssociateKmsKey"
+              Resource: 
+                - "arn:aws:logs:*:*:/aws-glue/*"
+            - Sid: ec2TagPermissions
+              Effect: Allow
+              Action:
+                - "ec2:CreateTags"
+                - "ec2:DeleteTags"
+              Resource:
+                - "arn:aws:ec2:*:*:network-interface/*"
+                - "arn:aws:ec2:*:*:security-group/*"
+                - "arn:aws:ec2:*:*:instance/*"
+              Condition:
+                StringEquals:
+                  aws:TagKeys: 
+                    - "aws-glue-service-resource"
       RoleName: !Sub ${applicationName}-glue-executor
       Tags:
         - Key: "Application"
@@ -1052,6 +1060,16 @@ Resources:
         - arn:aws:iam::aws:policy/CloudWatchLogsReadOnlyAccess
         - arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess
         - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
+      Policies:
+        - PolicyName: !Sub ${applicationName}-dms-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: MigrationPermissions
+                Action:
+                  - dms:*
+                Effect: Allow
+                Resource: '*'
   
   PowerUserGroup:
     Type: AWS::IAM::Group

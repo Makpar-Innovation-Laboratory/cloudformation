@@ -506,6 +506,16 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}-TaskBucket
   
+  DataBucketArn:
+    Value: !GetAtt DataBucket.Arn
+    Description: Bucket arn for Data bucket
+    Export: 
+      Name: !Sub ${AWS::StackName}-DataBucketARN
+  DataBucket:
+    Value: !Ref DataBucket
+    Description: Bucket name of Data bucket
+    Export:
+      Name: !Sub ${AWS::StackName}-DataBucket
 
   DockerRepository:
     Value: !GetAtt DockerRepo.Name

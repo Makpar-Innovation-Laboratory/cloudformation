@@ -188,22 +188,20 @@ Innolab-MigrationStack:
       ParameterValue: !env HOSTED_ZONE_ID
     - ParameterKey: clientKeyName
       ParameterValue: innolab_migration_client
-    - ParameterKey: dbSourceUsername
-      ParameterValue: !env ORACLE_RDS_USERNAME
-    - ParameterKey: dbSourcePassword
-      ParameterValue: !env ORACLE_RDS_PASSWORD
     - ParameterKey: dbSourceEngine
       ParameterValue: oracle
-    - ParameterKey: dbTargetUsername
-      ParameterValue: !env POSTGRES_RDS_USERNAME
-    - ParameterKey: dbTargetPassword
-      ParameterValue: !env POSTGRES_RDS_PASSWORD
     - ParameterKey: dbTargetEngine
       ParameterValue: postgres
     - ParameterKey: targetStack
       ParameterValue: Innolab-Postgres-RDSStack-Dev
     - ParameterKey: sourceStack
       ParameterValue: Innolab-Oracle-RDSStack-Dev
+    - ParameterKey: sourceBucketFolder
+      ParameterValue: migration/data/mc-property-tax
     - ParameterKey: vpcStack
       ParameterValue: Innolab-VPCStack-Dev
+    - ParameterKey: repoStack
+      ParameterValue: Innolab-RepoStack
+    - ParameterKey: iamStack
+      ParameterValue: Innolab-IAMStack
   

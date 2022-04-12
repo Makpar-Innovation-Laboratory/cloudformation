@@ -23,23 +23,13 @@ Parameters:
         Type: String
         Description: Domain where resources are hosted
         Default: makpar-innovation.net
-    dbSourceUsername: 
+    sourceBucketFolder:
         Type: String
-        NoEcho: true
-    dbSourcePassword:
-        Type: String
-        NoEcho: true
     dbSourceEngine:
         Type: String
         AllowedValues:
             - postgres
             - oracle
-    dbTargetUsername:
-        Type: String
-        NoEcho: true
-    dbTargetPassword:
-        Type: String
-        NoEcho: true
     dbTargetEngine:
         Type: String
         AllowedValues:
@@ -47,14 +37,20 @@ Parameters:
             - oracle
     targetStack:
         Type: String
+        Default: Innolab-Postgres-RDSStack-Dev
     sourceStack:
         Type: String
+        Default: Innolab-Oracle-RDSStack-Dev
     vpcStack:
         Type: String
         Default: Innolab-VPCStack-Dev
     iamStack:
-        Type:
+        Type: String
         Default: Innolab-IAMStack
+    repoStack:
+        Type: String
+        Default: Innolab-RepoStack
+
 
 Mappings:
   ConfigMap:
@@ -66,14 +62,26 @@ Mappings:
       database: ORCL
 
 Resources:
-    SourceDMSEndpoint:
+    SourceS3DMSEndpoint:
         Type: "AWS::DMS::Endpoint"
         Properties:
-            EndpointIdentifier: !Sub "${applicationName}-${environmentName}-source-endpoint"
+            EndpointIdentifier: !Sub "${applicationName}-${environmentName}-s3-source-endpoint"
+            EndpointType: source
+            EngineName: s3
+            S3Settings:
+                BucketName: 
+                    Fn::ImportValue: !Sub "${repoStack}-DataBucket"
+                BucketFolder: !Ref sourceBucketFolder
+                # ExternalTableDefinition:
+
+    SourceRDSDMSEndpoint:
+        Type: "AWS::DMS::Endpoint"
+        Properties:
+            EndpointIdentifier: !Sub "${applicationName}-${environmentName}-${dbSourceEngine}-source-endpoint"
             EndpointType: source
             EngineName: !Ref dbSourceEngine
-            Username: !Ref dbSourceUsername
-            Password: !Ref dbSourcePassword
+            Username: !Sub "{{resolve:secretsmanager:${applicationName}-${environmentName}-${dbSourceEngine}-dbUsername:SecretString}}"
+            Password: !Sub "{{resolve:secretsmanager:${applicationName}-${environmentName}-${dbSourceEngine}-dbPassword:SecretString}}"
             ServerName: 
                 Fn::ImportValue: !Sub "${sourceStack}-RDSEndpoint"
             Port: 
@@ -88,14 +96,14 @@ Resources:
                     - database
             SslMode: "none"
 
-    TargetDMSEndpoint:
+    TargetRDSDMSEndpoint:
         Type: "AWS::DMS::Endpoint"
         Properties:
-            EndpointIdentifier: !Sub "${applicationName}-${environmentName}-target-endpoint"
+            EndpointIdentifier: !Sub "${applicationName}-${environmentName}-${dbTargetEngine}-target-endpoint"
             EndpointType: target
             EngineName: !Ref dbTargetEngine
-            Username: !Ref dbTargetUsername
-            Password: !Ref dbTargetPassword
+            Username: !Sub "{{resolve:secretsmanager:${applicationName}-${environmentName}-${dbTargetEngine}-dbUsername:SecretString}}"
+            Password: !Sub "{{resolve:secretsmanager:${applicationName}-${environmentName}-${dbTargetEngine}-dbPassword:SecretString}}"
             ServerName: 
                 Fn::ImportValue: !Sub "${targetStack}-RDSEndpoint"
             Port:
