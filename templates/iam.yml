@@ -316,6 +316,22 @@ Resources:
         - Key: "Application"
           Value: !Ref applicationName
 
+  GlueNotebookExecutor:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${applicationName}-glue-notebook-executor
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal: 
+            Service:
+              - "ec2.amazonaws.com"
+          Action:
+            - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceNotebookRole
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
   ECSRole:
     Type: AWS::IAM::Role
     Properties:
