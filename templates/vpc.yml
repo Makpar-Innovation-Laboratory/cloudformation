@@ -268,15 +268,6 @@ Resources:
     DependsOn:
       - NATSecurityGroup
 
-  OracleSecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref DatabaseSecurityGroup
-      IpProtocol: tcp
-      SourceSecurityGroupId: !GetAtt NATSecurityGroup.GroupId
-      FromPort: 1521
-      ToPort: 1521
-
   ElasticIPAddress:
    Type: AWS::EC2::EIP
    Condition: NotBastionHost
@@ -321,6 +312,16 @@ Resources:
         ToPort: '65535'
         Description: Allow all outgoing traffic
         CidrIp: 0.0.0.0/0
+
+  NATSelfIngress:
+    # Because sometimes there are services in a security group that aren't in the VPC CIDR block...
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref NATSecurityGroup
+      IpProtocol: tcp
+      FromPort: '0'
+      ToPort: '65535'
+      SourceSecurityGroupId: !Ref NATSecurityGroup
 
   # SECRET FOR PRIVATE KEY
   

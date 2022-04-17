@@ -53,7 +53,7 @@ Resources:
     Type: "AWS::EC2::Instance"
     Properties:
       ImageId: "ami-0b0af3577fe5e3532"
-      InstanceType: "m4.xlarge"
+      InstanceType: "m4.2xlarge"
       KeyName: !Ref alationKeyName
       AvailabilityZone: !Sub "${AWS::Region}b"
       Tenancy: "default"

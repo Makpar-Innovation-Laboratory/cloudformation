@@ -308,7 +308,7 @@ Resources:
                 - "arn:aws:ec2:*:*:security-group/*"
                 - "arn:aws:ec2:*:*:instance/*"
               Condition:
-                StringEquals:
+                ForAllValues:StringEquals:
                   aws:TagKeys: 
                     - "aws-glue-service-resource"
       RoleName: !Sub ${applicationName}-glue-executor

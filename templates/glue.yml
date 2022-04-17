@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: ""
+
+Parameters:
+  applicationName:
+    Type: String
+    Default: innolab
+    Description: Application namespace where resources are deploying
+  environmentName:
+    Type: String
+    Default: Dev
+    Description: Environment into which the application is deploying
+  vpcStack:
+    Type: String
+    Default: Innolab-VPCStack-Dev
+    Description: Cross-stack referenced to the applicationName VPCStack
+
+Resources:
+  RDSConnection:
+    Type: AWS::Glue::Connection
+    CatalogId: !Ref AWS::AccountId
+    ConnectionInput:
+      ConnectionProperties: "{}"
+      ConnectionType: JDBC
+      Description: !Sub "JDBC connection for ${applicationName} ${environmentName} environment."
+      Name: !Sub "${applicationName}-${environmentName}-jdbc-glue-connection"
+      PhysicalConnectionRequirements:
+        SecurityGroupIdList:
+          - Fn::ImportValue: !Sub "${vpcStack}-NATSecurityGroup"
+        SubnetId:
+          Fn::ImportValue: !Sub "${vpcStack}-PublicSubnetA"
+
+
+  S3Connection:
+    Type: AWS::Glue::Connection
+    CatalogId: !Ref AWS::AccountId
+    ConnectionInput:
+      ConnectionProperties: "{}"
+      ConnectionType: NETWORK
+      Description: !Sub "S3 connection for ${applicationName} ${environmetName} environment"
+      Name: !Sub "${applicationName}-${environmentName}-s3-glue-connection"
+      PhysicalConnectionRequirements:
+        SecurityGroupIdList:
+          - Fn::ImportValue: !Sub "${vpcStack}-NATSecurityGroup"
+        SubnetId: 
+          Fn::ImportValue: !Sub "${vpcStack}-PublicSubnetA"
