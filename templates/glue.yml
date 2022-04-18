@@ -11,10 +11,14 @@ Parameters:
     Type: String
     Default: Dev
     Description: Environment into which the application is deploying
+  repoStack:
+    Type: String
+    Default: Innolab-RepoStack
+    Description: Cross-stack reference to the applicationName RepoStack
   vpcStack:
     Type: String
     Default: Innolab-VPCStack-Dev
-    Description: Cross-stack referenced to the applicationName VPCStack
+    Description: Cross-stack reference to the applicationName VPCStack
 
 Resources:
   RDSConnection:
@@ -29,8 +33,7 @@ Resources:
         SecurityGroupIdList:
           - Fn::ImportValue: !Sub "${vpcStack}-NATSecurityGroup"
         SubnetId:
-          Fn::ImportValue: !Sub "${vpcStack}-PublicSubnetA"
-
+          Fn::ImportValue: !Sub "${vpcStack}-PrivateSubnetA"
 
   S3Connection:
     Type: AWS::Glue::Connection
@@ -44,4 +47,21 @@ Resources:
         SecurityGroupIdList:
           - Fn::ImportValue: !Sub "${vpcStack}-NATSecurityGroup"
         SubnetId: 
-          Fn::ImportValue: !Sub "${vpcStack}-PublicSubnetA"
+          Fn::ImportValue: !Sub "${vpcStack}-PrivateSubnetA"
+
+  S3GatewayEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+            Resource:
+              - Fn::ImportValue: !Sub "${repoStack}-DataBucketARN"
+      RouteTableIds:
+        - Fn::ImportValue: !Sub "${vpcStack}-PrivateRouteTable"
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      VpcId: Fn::ImportValue: !Sub "${vpcStack}-VPC"

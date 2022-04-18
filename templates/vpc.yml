@@ -419,6 +419,16 @@ Outputs:
     Value: !Ref PrivateSubnetB
     Export:
       Name: !Sub ${AWS::StackName}-PrivateSubnetB
+  PublicRouteTable:
+    Description: Public route tbale
+    Value: !Ref PublicRouteTable
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicRouteTable
+  PrivateRouteTable:
+    Description: Private route table
+    Value: !Ref PrivateRouteTable
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateRouteTable
   DatabaseSecurityGroupId:
     Value: !Ref DatabaseSecurityGroup
     Export: 

@@ -144,6 +144,7 @@ The following tables detail the cross stack dependencies between different stack
 | VPCStack-@env | None |  
 | RDSStack-@env | VPCStack-@env, IAMStack | 
 | ClusterStack-@env | VPCStack-@env |
+| GlueStack-@env | RepoStack, VPCStack-@env, 
 
 ### Serverless Stacks
 
@@ -168,6 +169,7 @@ The following tables detail the cross stack dependencies between different stack
 | Stack | Dependency |
 | ----- | --------- |
 | AlationStack | VPCStack-Dev |
+| MigrationStack | VPCStack-Dev |
 
 ## References
 
